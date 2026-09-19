@@ -14,7 +14,8 @@ completed controls.
 | HTTP query string and headers | Untrusted input | Injection, control characters, oversized values |
 | Flask request handling | Trust boundary | Validation, error handling and response policy |
 | SQL statement construction | Critical boundary | Code/data separation and least privilege |
-| Campaign records | Synthetic asset | Confidentiality and integrity demonstration |
+| Campaign records | Synthetic multi-tenant asset | Confidentiality and integrity demonstration |
+| Signed bearer token | Authentication evidence | Forgery, replay, expiry and claim validation |
 | Logs/request IDs | Operational metadata | Log injection and cross-request correlation |
 
 ## STRIDE analysis
@@ -22,11 +23,13 @@ completed controls.
 | Threat | Example | Primary control | Verification |
 | --- | --- | --- | --- |
 | Spoofing | Caller supplies a misleading request ID | Constrained request-ID grammar | Invalid ID replacement test |
+| Spoofing | Caller tampers with a bearer token | Timed cryptographic signature | Tampered-token test |
 | Tampering | SQL metacharacters alter the query | SQLite parameter binding | Boolean and UNION payload tests |
 | Repudiation | Requests cannot be correlated | Response request ID | Preservation/generation tests |
 | Information disclosure | Framework error exposes internals | Structured JSON errors, debug disabled | 404 response test |
 | Denial of service | Oversized request values | Length/body limits | Overlong-name test |
-| Elevation of privilege | Not applicable to unauthenticated read-only lab | Out of scope; document rather than claim | Scope review |
+| Elevation of privilege | Viewer requests admin audit endpoint | Explicit RBAC check | Viewer/admin tests |
+| Information disclosure | Tenant reads another tenant's object | ID and tenant scoped query | BOLA regression test |
 
 ## Abuse cases
 
@@ -35,10 +38,12 @@ completed controls.
 3. A client sends control characters in metadata to corrupt downstream logs.
 4. A client probes missing routes hoping to obtain stack traces.
 5. A client submits oversized input to consume application or logging resources.
+6. A tenant changes an object identifier to access another tenant's campaign.
+7. A viewer attempts to invoke the security-administrator audit endpoint.
 
 ## Residual risk
 
-This exercise uses an in-memory database and Flask's test client. A production design would also need
-authentication and authorisation, TLS termination, rate limiting, centralised safe logging, database
-credentials with minimum privileges, monitoring, deployment hardening, dependency governance and
-incident-response procedures.
+This exercise uses an in-memory database, a process-local signing key and process-local audit events.
+A production design would use a managed identity provider, key rotation and revocation, TLS, rate
+limiting, immutable central logging, least-privileged database credentials, monitoring, deployment
+hardening and incident-response procedures.
