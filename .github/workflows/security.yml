@@ -11,10 +11,14 @@ permissions:
   contents: read
 
 jobs:
-  regression-tests:
-    name: Regression tests
+  tests:
+    name: Tests / Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12', '3.13']
     steps:
       - name: Check out source
         uses: actions/checkout@v7
@@ -23,17 +27,21 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
-          python-version: '3.12'
+          python-version: ${{ matrix.python-version }}
+          cache: pip
       - name: Install dependencies
-        run: python -m pip install -r requirements.txt
-      - name: Test application and security behaviour
+        run: python -m pip install -r requirements-dev.txt
+      - name: Run security regression tests
         run: python -m unittest discover -s tests -v
+      - name: Run Ruff
+        run: ruff check app.py tests
+      - name: Run Bandit
+        run: bandit -q -r app.py
 
   codeql:
     name: CodeQL Python
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    # This job deliberately runs independently of the failing baseline tests.
     permissions:
       contents: read
       security-events: write
@@ -46,6 +54,7 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: '3.12'
+          cache: pip
       - name: Initialise CodeQL
         uses: github/codeql-action/init@v4
         with:
