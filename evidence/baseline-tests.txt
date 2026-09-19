@@ -1,0 +1,75 @@
+test_empty_name (test_app.CampaignSecurityTests.test_empty_name) ... ok
+test_exact_match (test_app.CampaignSecurityTests.test_exact_match) ... ok
+test_legitimate_apostrophe_is_supported (test_app.CampaignSecurityTests.test_legitimate_apostrophe_is_supported) ... ERROR
+test_sql_injection_does_not_return_all_records (test_app.CampaignSecurityTests.test_sql_injection_does_not_return_all_records) ... FAIL
+test_unknown_name (test_app.CampaignSecurityTests.test_unknown_name) ... ok
+
+======================================================================
+ERROR: test_legitimate_apostrophe_is_supported (test_app.CampaignSecurityTests.test_legitimate_apostrophe_is_supported)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/7b400b84a074/codeql-lab/tests/test_app.py", line 32, in test_legitimate_apostrophe_is_supported
+    response = self.search("Editor's Demo")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7b400b84a074/codeql-lab/tests/test_app.py", line 13, in search
+    return self.client.get('/campaigns', query_string={'name': value})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7b400b84a074/lab-deps/werkzeug/test.py", line 1162, in get
+    return self.open(*args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7b400b84a074/lab-deps/flask/testing.py", line 235, in open
+    response = super().open(
+               ^^^^^^^^^^^^^
+  File "/workspace/scratch/7b400b84a074/lab-deps/werkzeug/test.py", line 1116, in open
+    response_parts = self.run_wsgi_app(request.environ, buffered=buffered)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7b400b84a074/lab-deps/werkzeug/test.py", line 988, in run_wsgi_app
+    rv = run_wsgi_app(self.application, environ, buffered=buffered)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7b400b84a074/lab-deps/werkzeug/test.py", line 1264, in run_wsgi_app
+    app_rv = app(environ, start_response)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7b400b84a074/lab-deps/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7b400b84a074/lab-deps/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7b400b84a074/lab-deps/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7b400b84a074/lab-deps/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7b400b84a074/lab-deps/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7b400b84a074/lab-deps/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7b400b84a074/codeql-lab/app.py", line 21, in campaigns
+    rows = db.execute(query).fetchall()
+           ^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: near "s": syntax error
+
+======================================================================
+FAIL: test_sql_injection_does_not_return_all_records (test_app.CampaignSecurityTests.test_sql_injection_does_not_return_all_records)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/7b400b84a074/codeql-lab/tests/test_app.py", line 29, in test_sql_injection_does_not_return_all_records
+    self.assertEqual(response.get_json(), [])
+AssertionError: Lists differ: [{'id': 1, 'name': 'Summer Demo'}, {'id': [57 chars]mo"}] != []
+
+First list contains 3 additional elements.
+First extra element 0:
+{'id': 1, 'name': 'Summer Demo'}
+
++ []
+- [{'id': 1, 'name': 'Summer Demo'},
+-  {'id': 2, 'name': 'Winter Demo'},
+-  {'id': 3, 'name': "Editor's Demo"}]
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.054s
+
+FAILED (failures=1, errors=1)

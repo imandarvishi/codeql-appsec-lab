@@ -1,0 +1,10 @@
+test_empty_name (test_app.CampaignSecurityTests.test_empty_name) ... ok
+test_exact_match (test_app.CampaignSecurityTests.test_exact_match) ... ok
+test_legitimate_apostrophe_is_supported (test_app.CampaignSecurityTests.test_legitimate_apostrophe_is_supported) ... ok
+test_sql_injection_does_not_return_all_records (test_app.CampaignSecurityTests.test_sql_injection_does_not_return_all_records) ... ok
+test_unknown_name (test_app.CampaignSecurityTests.test_unknown_name) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.055s
+
+OK

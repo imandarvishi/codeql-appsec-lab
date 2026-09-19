@@ -1,0 +1,17 @@
+In app.py replace these THREE lines:
+
+        # TRAINING BUG: untrusted request input changes the SQL statement.
+        query = "SELECT id, name FROM campaigns WHERE name = '" + name + "'"
+        rows = db.execute(query).fetchall()
+
+with these THREE lines (preserve indentation):
+
+        # Bind request input as data, separately from the SQL statement.
+        query = 'SELECT id, name FROM campaigns WHERE name = ?'
+        rows = db.execute(query, (name,)).fetchall()
+
+Also update the module docstring to:
+"""SQL injection remediation training app. Synthetic data only."""
+
+The trailing comma in (name,) makes a one-element tuple for SQLite bindings.
+Do not delete or relax the tests. Both security tests should pass after this change.
